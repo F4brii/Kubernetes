@@ -1,0 +1,16 @@
+Comando
+
+    sudo minikubestart start  --drive=none --> Inicia una maquina virtual
+    sudo kubectl apply -f archivo.yaml ---> Crear lo que este en el archivo
+    sudo kubectl get pod, limitRange, entret otros ---> Traes lo que s le solicite
+
+
+
+    Crear superusuario 
+
+    cb048c034988
+    kubectl exec deploy-django-846657fcf8-8gmx4 -it -- ./manage.py createsuperuser
+
+    docker exec -it cb048c034988 python manage.py createsuperuser
+
+    docker exec -i -t b00e946232a6 /bin/bash

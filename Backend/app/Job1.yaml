@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-django-1
+  namespace: backend
+spec:
+  template:
+    spec:
+      containers:
+        - name: django-job
+          image: localhost:5000/django:latest
+          command: ["python", "manage.py", "makemigrations", "schedule"]
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+            - name: POSTGRES_HOST
+              value: service-postgres
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: data
+              mountPath: /code
+            - name: static
+              mountPath: /code/static
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: pvc-django
+        - name: static
+          persistentVolumeClaim:
+            claimName: pvc-django-static
+      restartPolicy: Never
+  backoffLimit: 4

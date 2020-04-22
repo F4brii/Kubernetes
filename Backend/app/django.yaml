@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: volumen-django
+  namespace: backend
+  labels:
+    app: volumen-django
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce #Limita el uso del pv a los pods uno o mas al tiempo
+  storageClassName: manual
+  hostPath:
+    path: "/home/fabricio/Escritorio/Kubernetes/Backend/app/app/src"
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: volumen-django-static
+  namespace: backend
+  labels:
+    app: volumen-django-static
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce #Limita el uso del pv a los pods uno o mas al tiempo
+  storageClassName: manual
+  hostPath:
+    path: "/home/fabricio/Escritorio/Kubernetes/Backend/app/app/src/static"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-django
+  namespace: backend
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: manual
+  selector:
+    matchLabels:
+      app: volumen-django
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-django-static
+  namespace: backend
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: manual
+  selector:
+    matchLabels:
+      app: volumen-django-static
+
+---
+apiVersion: apps/v1 #Deployment
+kind: Deployment
+metadata:
+  name: deploy-django
+  namespace: backend
+  labels:
+    app: deploy-django
+spec:
+  replicas: 1 #replicaSets
+  selector:
+    matchLabels:
+      app: django
+  template: #Pod
+    metadata:
+      labels:
+        app: django
+    spec:
+      containers:
+        - name: django
+          image: localhost:5000/django:latest
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+            - name: POSTGRES_HOST
+              value: service-postgres
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: data
+              mountPath: /code
+            - name: static
+              mountPath: /code/static
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: pvc-django
+        - name: static
+          persistentVolumeClaim:
+            claimName: pvc-django-static
+
+#Serivice
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+  namespace: backend
+spec:
+  selector:
+    app: django
+  ports:
+    - name: django
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
