@@ -1,15 +1,15 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: test-ingress
+  name: ingress-next
   namespace: frontend
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - http:
-      paths:
-      - path: /next
-        backend:
-          serviceName: nginx
-          servicePort: 8080
+    - host: next.com
+      http:
+        paths:
+          - backend:
+              serviceName: nginx-next
+              servicePort: 8080

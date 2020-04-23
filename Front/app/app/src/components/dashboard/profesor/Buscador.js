@@ -41,7 +41,7 @@ export default function Buscador() {
 
         const token = cookies.get('token');
 
-        fetch(`http://192.168.0.19:30042/teacher/${id}/`, {
+        fetch(`http://192.168.0.19:32341/teacher/${id}/`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

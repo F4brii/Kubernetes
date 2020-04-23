@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nginx-conf
+  name: nginx-conf-django
   namespace: backend
 data:
   nginx: |
-    upstream my-service {
+    upstream django-service {
       ip_hash;
-      server my-service:8000;
+      server django-service:8000;
     }
     server {
       listen 80;
@@ -16,7 +16,7 @@ data:
         proxy_set_header	X-Real-IP $remote_addr;
         proxy_set_header	Host $http_host;
         proxy_set_header 	X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass http://my-service;
+        proxy_pass http://django-service;
         proxy_connect_timeout       3600s;
         proxy_send_timeout          3600s;
         proxy_read_timeout          3600s;
@@ -31,7 +31,7 @@ data:
 apiVersion: apps/v1 #Deployment
 kind: Deployment
 metadata:
-  name: deploy-nginx
+  name: nginx-django
   namespace: backend
   labels:
     app: deploy-nginx
@@ -39,14 +39,14 @@ spec:
   replicas: 1 #replicaSets
   selector:
     matchLabels:
-      app: nginx
+      app: nginx-django
   template:
     metadata:
       labels:
-        app: nginx
+        app: nginx-django
     spec:
       containers:
-        - name: nginx
+        - name: nginx-django
           image: nginx:1.17.3
           lifecycle:
             preStop:
@@ -62,7 +62,7 @@ spec:
       volumes:
         - name: data
           configMap:
-            name: nginx-conf
+            name: nginx-conf-django
             items:
               - key: nginx
                 path: default.conf
@@ -74,12 +74,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx
+  name: nginx-django
   namespace: backend
 spec:
   type: ClusterIP
   selector:
-    app: nginx
+    app: nginx-django
   ports:
     - protocol: TCP
       port: 8080

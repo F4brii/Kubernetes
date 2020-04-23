@@ -16,7 +16,7 @@ export default class extends React.Component {
     componentWillMount() {
         const token = cookies.get('token');
 
-        fetch('http://192.168.0.19:30042/teachers', {
+        fetch('http://192.168.0.19:32341/teachers', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

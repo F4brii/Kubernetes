@@ -10,14 +10,14 @@ spec:
   replicas: 1 #replicaSets
   selector:
     matchLabels:
-      app: nginx
+      app: nginx-next
   template:
     metadata:
       labels:
-        app: nginx
+        app: nginx-next
     spec:
       containers:
-        - name: nginx
+        - name: nginx-next
           image: localhost:5000/nginx:latest
           ports:
             - containerPort: 80
@@ -25,12 +25,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx
+  name: nginx-next
   namespace: frontend
 spec:
   type: ClusterIP
   selector:
-    app: nginx
+    app: nginx-next
   ports:
     - protocol: TCP
       port: 8080

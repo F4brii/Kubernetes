@@ -13,4 +13,4 @@ Comando
 
     docker exec -it cb048c034988 python manage.py createsuperuser
 
-    docker exec -i -t b00e946232a6 /bin/bash
+    docker exec -i -t 02b828906780   /bin/bash
